@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% for message in messages %}
+        <div style="border:1px black solid; margin:10px; padding:10px"><span style="text-decoration:underline">{{message.usermessage}}</span>:&nbsp;{{message.textmessage}}</div>
+    {% endfor %}
+{% endblock %}
