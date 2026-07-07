@@ -6,7 +6,7 @@ export const useAuthStore = defineStore('auth', () => {
     const currentUser = ref(null);
     const isLoaded = ref(false);
 
-    const isAuthenticated = computed(() => Boolean(currentUser.value))
+    const isAuthenticated = computed(() => currentUser.value?.is_authenticated ?? false)
     const displayName = computed(() => currentUser.value?.user.full_name || currentUser.value?.username)
     const id = computed(() => currentUser.value?.user?.id)
     const last_login = computed(() => currentUser.value?.user.last_login)

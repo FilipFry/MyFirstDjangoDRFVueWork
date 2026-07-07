@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted,onUpdated, computed, onBeforeMount } from 'vue';
+import { ref, onMounted,onUpdated, computed, onBeforeMount, onUnmounted } from 'vue';
 import { Message, Users } from '@/api.js'
 import { useAuthStore } from '@/stores/auth.js'
 import moment from 'moment'
@@ -7,6 +7,7 @@ import moment from 'moment'
 const MessageDisplay = ref([])
 const UsersDisplay = ref([])
 const authStore = useAuthStore()
+let timer;
 
 const form = ref({
             textmessage: '',
@@ -38,9 +39,13 @@ const getFormatDate = (date) => {
 const sent = async () => {
 	const response = await Message.save(form.value)
 }
-onBeforeMount(() => {
+onMounted(() => {
 	getMessagesList()
 	getUsersList()
+	timer = setInterval(getMessagesList, 1000)
+})
+onUnmounted(() => {
+	clearInterval(timer)
 })
 </script>
 
@@ -51,9 +56,10 @@ onBeforeMount(() => {
 			<div class="col-2">
 				<div class="d-flex flex-column border border-primary mt-2">
 					<div class="d-block p-2 text-bg-primary">
-						User Pannel
+						User Pannel {{ authStore.isAuthenticated }}
+					
 					</div>
-					<div v-if="authStore.currentUser.is_authenticated">
+					<div v-if="authStore.isAuthenticated">
 						<div class="border border-secondary m-1">
 							<RouterLink v-if="authStore.id" :to="{
 								name: 'profile',
@@ -79,14 +85,14 @@ onBeforeMount(() => {
 							</div>
 						</div>
 						<div class="border border-secondary m-1">
-							Edit profile
-						</div>
-						<div class="border border-secondary m-1">
-							<button type="button" class="btn btn-outline-primary btn-sm btn-block">Logout</button>
+							<form v-if="authStore.isAuthenticated" method="post" action="/accounts/logout/" class="mb-0">
+            					<input type="hidden" name="csrfmiddlewaretoken" :value="csrfToken">
+            					<button type="submit" class="btn btn-outline-secondary btn-sm">Выйти</button>
+							</form>
 						</div>
 					</div>
 					<div v-else>
-						User is not autentificated, please <br> Login or <br> register
+						<p class="text-break">User is not autentificated, please <a href="/accounts/login/">LOGIN</a> or register</p>						
 					</div>
 				</div>
 				<!--USER BLOCK END-->
@@ -115,27 +121,44 @@ onBeforeMount(() => {
 			<div class="col-8">
 				<div class="border border-primary p-1">
 					<!--MESSAGES BLOCK START-->
-
-					<div class="height overflow-scroll" v-if="MessageDisplay.length > 0">
+					<div class="align-items-end" v-if="authStore.isAuthenticated">
+					<div class="height overflow-y-auto" v-if="MessageDisplay.length > 0">
 						<div v-for="message in MessageDisplay">
 							<div v-if="!message.is_private">
 								<span class="text-bg-info">{{ message.usermessage_display }}</span>
-								<span class="text-bg-warning">&nbsp;:&nbsp;{{ getFormatDate(message.datemessage)
-								}}&nbsp;:&nbsp;</span>
+								<span class="text-bg-warning">&nbsp;:&nbsp;{{ getFormatDate(message.datemessage)}}&nbsp;:&nbsp;</span>
 								<span class="text-break">{{ message.textmessage }}</span>
 							</div>
 						</div>
 					</div>
-
+					</div>
+					<div v-else>
+						<div>
+						<span class="text-bg-info">ADMIN</span>
+						<span class="text-bg-warning">&nbsp;:&nbsp;00:00&nbsp;:&nbsp;</span>
+						<span class="text-break">Неавторизированному пользователю</span>
+						</div>
+						<div>
+						<span class="text-bg-info">ADMIN</span>
+						<span class="text-bg-warning">&nbsp;:&nbsp;00:01&nbsp;:&nbsp;</span>
+						<span class="text-break">Нельзя читать</span>
+						</div>
+						<div>
+						<span class="text-bg-info">ADMIN</span>
+						<span class="text-bg-warning">&nbsp;:&nbsp;00:02&nbsp;:&nbsp;</span>
+						<span class="text-break">А то нос сотвалится</span>
+						</div>
+					</div>
 					<!--MESSAGES BLOCK END-->
 					<!--MESSAGE SENT BLOCK START-->
-					<div class="align-items-end" v-if="authStore.currentUser.is_authenticated">
-						<form @submit="sent">
-							<input class="form-control" id="message" v-model="form.textmessage" required />
+					<div class="align-items-end" v-if="authStore.isAuthenticated">
+						<form @submit="sent" class="d-flex">
+							<input class="form-control" id="message" v-model="form.textmessage" required autofocus />
 							<input class="btn btn-primary" type="submit" />
 						</form>
 					</div>
 					<div v-else>
+						
 						<span>Aaaa. Сначала адо авторизироваться. <button type="button" class="btn btn-outline-primary btn-sm btn-block">Отправить</button></span>
 					</div>
 					<!--MESSAGE SENT BLOCK END-->

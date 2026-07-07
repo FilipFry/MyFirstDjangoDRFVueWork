@@ -63,7 +63,7 @@ ROOT_URLCONF = 'my_awesome_site.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -135,5 +135,5 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # STATICFILES_DIRS = ["assets", BASE_DIR / "assets",]
 
 AUTH_USER_MODEL = 'chat.User'
-LOGIN_REDIRECT_URL = "home"
-LOGOUT_REDIRECT_URL = "home"
+LOGIN_REDIRECT_URL = 'http://127.0.0.1:8080/chat'
+LOGOUT_REDIRECT_URL = 'http://127.0.0.1:8080/chat'

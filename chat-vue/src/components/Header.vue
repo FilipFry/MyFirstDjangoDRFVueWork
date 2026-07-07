@@ -25,6 +25,7 @@ onMounted(() => {
             <div class="col-12 border border-primary">
                 <p class="h1 text-center">
 				    My_AWESOME_chat_header
+					<a class="btn btn-primary btn-sm" href="/accounts/login/">Войти</a>
 			    </p>
             </div>
 		</div>

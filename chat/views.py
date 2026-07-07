@@ -52,17 +52,6 @@ class MessageViewSet(ModelViewSet):
 # def vue_app(request):
 #     return render(request, "index.html")
 
-def login_view(request):
-    if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            # Аутентифицируем и логиним пользователя
-            user = form.get_user()
-            login(request, user)
-            return redirect('/')  # или любой URL после входа
-    else:
-        form = AuthenticationForm(request)
-    return render(request, 'login.html', {'form': form})
 
 # def chat_view(request):
 #      chat = Message.objects.all()

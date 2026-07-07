@@ -1,21 +1,33 @@
+from django import forms
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import User, Message
+class UserAdminCreationForm(forms.ModelForm):
+    password = forms.CharField(label="Пароль", widget=forms.PasswordInput)
+
+    class Meta:
+        model = User
+        fields = ("username", "first_name", "last_name", "email", "password", "gender", "about")
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.set_password(self.cleaned_data["password"])
+        if commit:
+            user.save()
+        return user
 
 @admin.register(User)
-class UserAdmin(admin.ModelAdmin):
-    list_display = (
-        "id",
-        "avatar",
-        "username",
-        "first_name",
-        "last_name",
-        "gender",
-        "date_joined",
-        "about",
-        "is_superuser",
-        "is_banned"
+class UserAdmin(BaseUserAdmin):
+    add_form = UserAdminCreationForm
+    add_fieldsets = (
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": ("username", "first_name", "last_name", "email", "password", "gender", "about"),
+            },
+        ),
     )
-#Генерация таблички с вышерепечисленными полями на главной странице Админки - 
     list_filter = (
         "gender",
         "is_superuser",
@@ -38,6 +50,21 @@ class UserAdmin(admin.ModelAdmin):
         "is_banned"
     )
 #Поиск (сверху) по всем полям кроме пароля и аватарки
+
+# @admin.register(User)
+# class UserAdmin(admin.ModelAdmin):
+#     list_display = (
+#         "id",
+#         "avatar",
+#         "username",
+#         "first_name",
+#         "last_name",
+#         "gender",
+#         "date_joined",
+#         "about",
+#         "is_superuser",
+#         "is_banned"
+#     )
 
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):

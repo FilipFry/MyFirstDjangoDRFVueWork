@@ -20,14 +20,12 @@ const proxyOptions = {
 }
 
 export default defineConfig({
-  // base: '/static/',
   plugins: [vue()],
   server: {
     port: 8080,
     host: '127.0.0.1',
     proxy: {
         '^/api': proxyOptions,
-        '^/me' : proxyOptions,
         '^/admin': proxyOptions,
         '^/media': proxyOptions,
         '^/static': proxyOptions,
